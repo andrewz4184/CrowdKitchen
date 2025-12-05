@@ -17,9 +17,11 @@ class RecipeRepository private constructor(private val context: Context) {
     fun getUserSettings(): UserSettings {
         val defaultMinutes = prefs.getInt(KEY_DEFAULT_TIMER_MINUTES, 10)
         val sortByRating = prefs.getBoolean(KEY_SORT_BY_RATING, true)
+        val darkMode = prefs.getBoolean(KEY_DARK_MODE, false)
         return UserSettings(
             defaultTimerMinutes = defaultMinutes,
-            sortByRating = sortByRating
+            sortByRating = sortByRating,
+            darkMode = darkMode
         )
     }
 
@@ -27,6 +29,7 @@ class RecipeRepository private constructor(private val context: Context) {
         prefs.edit()
             .putInt(KEY_DEFAULT_TIMER_MINUTES, settings.defaultTimerMinutes)
             .putBoolean(KEY_SORT_BY_RATING, settings.sortByRating)
+            .putBoolean(KEY_DARK_MODE, settings.darkMode)
             .apply()
     }
 
@@ -40,9 +43,11 @@ class RecipeRepository private constructor(private val context: Context) {
             .get()
             .addOnSuccessListener { snapshot ->
                 val recipes = snapshot.documents.mapNotNull { doc ->
+                    // Classic (non-KTX) Firestore API:
                     val recipe = doc.toObject(Recipe::class.java)
                     recipe?.copy(id = doc.id)
                 }
+
                 val settings = getUserSettings()
                 val sorted = if (settings.sortByRating) {
                     recipes.sortedByDescending { it.averageRating }
@@ -63,19 +68,47 @@ class RecipeRepository private constructor(private val context: Context) {
         onComplete: () -> Unit = {},
         onError: (Exception) -> Unit = {}
     ) {
-        // Simple scheme: store each rating in a "ratings" subcollection
         val ratingData = mapOf(
             "rating" to rating,
             "timestamp" to System.currentTimeMillis()
         )
 
-        firestore.collection(COLLECTION_RECIPES)
+        val recipeRef = firestore
+            .collection(COLLECTION_RECIPES)
             .document(recipeId)
+
+        // 1) Store individual rating in subcollection
+        recipeRef
             .collection(COLLECTION_RATINGS)
             .add(ratingData)
             .addOnSuccessListener {
-                // In a more complete implementation, you'd recompute the averageRating here.
-                onComplete()
+                // 2) Update aggregate rating fields on parent recipe doc
+                firestore.runTransaction { transaction ->
+                    val snapshot = transaction.get(recipeRef)
+
+                    val oldSum = snapshot.getDouble("ratingSum") ?: 0.0
+                    val oldCount = snapshot.getLong("ratingCount") ?: 0L
+
+                    val newSum = oldSum + rating
+                    val newCount = oldCount + 1
+                    val newAvg = if (newCount > 0) newSum / newCount else 0.0
+
+                    val updates = mapOf(
+                        "ratingSum" to newSum,
+                        "ratingCount" to newCount,
+                        "averageRating" to newAvg
+                    )
+
+                    transaction.update(recipeRef, updates)
+                    null // transaction block must return something
+                }
+                    .addOnSuccessListener {
+                        onComplete()
+                    }
+                    .addOnFailureListener { e ->
+                        Log.e(TAG, "Failed to update aggregate rating", e)
+                        onError(e)
+                    }
             }
             .addOnFailureListener { e ->
                 Log.e(TAG, "Failed to submit rating", e)
@@ -89,6 +122,7 @@ class RecipeRepository private constructor(private val context: Context) {
         private const val PREFS_NAME = "user_settings"
         private const val KEY_DEFAULT_TIMER_MINUTES = "default_timer_minutes"
         private const val KEY_SORT_BY_RATING = "sort_by_rating"
+        private const val KEY_DARK_MODE = "dark_mode"
 
         private const val COLLECTION_RECIPES = "recipes"
         private const val COLLECTION_RATINGS = "ratings"

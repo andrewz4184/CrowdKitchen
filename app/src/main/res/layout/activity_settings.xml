@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <!-- Back button -->
+    <ImageButton
+        android:id="@+id/buttonBackSettings"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:padding="8dp"
+        android:background="@android:color/transparent"
+        android:src="@drawable/ic_arrow_back_black_24dp"
+        android:contentDescription="Back"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <!-- Title -->
+    <TextView
+        android:id="@+id/textSettingsTitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Settings"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- Default timer minutes label -->
+    <TextView
+        android:id="@+id/labelDefaultTimer"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Default timer (minutes)"
+        android:layout_marginTop="32dp"
+        app:layout_constraintTop_toBottomOf="@id/textSettingsTitle"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- Default timer minutes input -->
+    <EditText
+        android:id="@+id/editDefaultTimerMinutes"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:inputType="number"
+        android:hint="10"
+        android:layout_marginTop="8dp"
+        app:layout_constraintTop_toBottomOf="@id/labelDefaultTimer"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- Sort by rating -->
+    <androidx.appcompat.widget.SwitchCompat
+        android:id="@+id/switchSortByRating"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Sort recipes by rating"
+        android:layout_marginTop="24dp"
+        app:layout_constraintTop_toBottomOf="@id/editDefaultTimerMinutes"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- Dark mode -->
+    <androidx.appcompat.widget.SwitchCompat
+        android:id="@+id/switchDarkMode"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Enable dark mode"
+        android:layout_marginTop="16dp"
+        app:layout_constraintTop_toBottomOf="@id/switchSortByRating"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- Save button -->
+    <Button
+        android:id="@+id/buttonSaveSettings"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Save Settings"
+        android:layout_marginTop="32dp"
+        app:layout_constraintTop_toBottomOf="@id/switchDarkMode"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -8,6 +8,7 @@ import android.widget.SeekBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import android.widget.ImageButton
 
 class TimerActivity : AppCompatActivity() {
 
@@ -41,6 +42,11 @@ class TimerActivity : AppCompatActivity() {
         seekBar.progress = selectedMinutes
         updateTimeLabel(selectedMinutes * 60 * 1000L)
         progressBar.max = selectedMinutes * 60
+
+        findViewById<ImageButton>(R.id.buttonBackTimer).setOnClickListener {
+            finish() // returns to MainActivity
+        }
+
 
         // New GUI component + listener: SeekBar
         seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {

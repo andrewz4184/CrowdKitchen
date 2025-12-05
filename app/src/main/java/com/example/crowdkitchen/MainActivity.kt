@@ -13,6 +13,7 @@ import android.widget.ImageButton
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -30,6 +31,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var searchEditText: EditText
     private lateinit var micButton: ImageButton
     private lateinit var buttonOpenTimer: Button
+    private lateinit var buttonOpenSettings: Button
 
     private lateinit var adView: AdView
 
@@ -45,12 +47,20 @@ class MainActivity : AppCompatActivity() {
         }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Apply saved theme BEFORE inflating layout
+        val repoForTheme = RecipeRepository.getInstance(this)
+        val settings = repoForTheme.getUserSettings()
+        AppCompatDelegate.setDefaultNightMode(
+            if (settings.darkMode) AppCompatDelegate.MODE_NIGHT_YES
+            else AppCompatDelegate.MODE_NIGHT_NO
+        )
+
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        repository = RecipeRepository.getInstance(this)
+        repository = repoForTheme
 
-        // Initialize Google Mobile Ads (fake/test ad)
+        // Initialize ads
         MobileAds.initialize(this) {}
         adView = findViewById(R.id.adView)
         val adRequest = AdRequest.Builder().build()
@@ -59,6 +69,7 @@ class MainActivity : AppCompatActivity() {
         searchEditText = findViewById(R.id.editTextSearch)
         micButton = findViewById(R.id.buttonMic)
         buttonOpenTimer = findViewById(R.id.buttonOpenTimer)
+        buttonOpenSettings = findViewById(R.id.buttonOpenSettings)
 
         recyclerView = findViewById(R.id.recyclerRecipes)
         recyclerView.layoutManager = LinearLayoutManager(this)
@@ -73,6 +84,11 @@ class MainActivity : AppCompatActivity() {
 
         buttonOpenTimer.setOnClickListener {
             val intent = Intent(this, TimerActivity::class.java)
+            startActivity(intent)
+        }
+
+        buttonOpenSettings.setOnClickListener {
+            val intent = Intent(this, SettingsActivity::class.java)
             startActivity(intent)
         }
 
@@ -110,7 +126,6 @@ class MainActivity : AppCompatActivity() {
         }
         startActivity(intent)
     }
-
 
     // ---------- Voice Search ----------
 
@@ -187,7 +202,6 @@ class MainActivity : AppCompatActivity() {
         super.onDestroy()
     }
 
-
     // ---------- RecyclerView Adapter ----------
 
     private inner class RecipeAdapter(
@@ -212,7 +226,6 @@ class MainActivity : AppCompatActivity() {
             notifyDataSetChanged()
         }
     }
-
 
     private inner class RecipeViewHolder(itemView: android.view.View) :
         RecyclerView.ViewHolder(itemView) {
