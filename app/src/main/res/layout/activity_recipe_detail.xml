@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <ImageButton
+            android:id="@+id/buttonBack"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:padding="8dp"
+            android:background="@android:color/transparent"
+            android:src="@drawable/ic_arrow_back_black_24dp"
+            android:contentDescription="Back"
+            android:layout_margin="8dp"/>
+
+
+        <TextView
+            android:id="@+id/textRecipeTitleDetail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Recipe Title"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp" />
+
+        <TextView
+            android:id="@+id/textRecipeDescriptionDetail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Short description of the recipe."
+            android:layout_marginBottom="8dp" />
+
+        <TextView
+            android:id="@+id/textCookTime"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Cook time: 30 minutes"
+            android:textStyle="italic"
+            android:layout_marginBottom="12dp" />
+
+        <!-- Ingredients -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Ingredients"
+            android:textStyle="bold"
+            android:layout_marginBottom="4dp" />
+
+        <TextView
+            android:id="@+id/textIngredients"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="• Ingredient 1\n• Ingredient 2"
+            android:layout_marginBottom="12dp" />
+
+        <!-- Steps -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Steps"
+            android:textStyle="bold"
+            android:layout_marginBottom="4dp" />
+
+        <TextView
+            android:id="@+id/textSteps"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="1. Step one...\n\n2. Step two..."
+            android:layout_marginBottom="16dp" />
+
+        <!-- User rating -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Your rating"
+            android:textStyle="bold"
+            android:layout_marginBottom="4dp" />
+
+        <RatingBar
+            android:id="@+id/ratingBarUser"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:numStars="5"
+            android:stepSize="1.0"
+            android:layout_marginBottom="12dp" />
+
+        <Button
+            android:id="@+id/buttonSubmitRating"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Submit Rating" />
+
+    </LinearLayout>
+</ScrollView>

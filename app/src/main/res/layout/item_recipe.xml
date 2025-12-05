@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="12dp"
+    android:foreground="?attr/selectableItemBackground"
+    android:background="@android:color/white"
+    android:elevation="2dp"
+    android:layout_marginTop="4dp"
+    android:layout_marginBottom="4dp">
+
+    <TextView
+        android:id="@+id/textRecipeTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Recipe Title"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:maxLines="1"
+        android:ellipsize="end" />
+
+    <RatingBar
+        android:id="@+id/ratingBarAverage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:isIndicator="true"
+        android:numStars="5"
+        android:stepSize="0.5" />
+
+</LinearLayout>
