@@ -1,20 +1,15 @@
 package com.example.crowdkitchen
 
-import android.Manifest
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.os.Bundle
-import android.speech.RecognitionListener
-import android.speech.RecognizerIntent
-import android.speech.SpeechRecognizer
+import android.text.Editable
+import android.text.TextWatcher
+import android.view.inputmethod.EditorInfo
 import android.widget.Button
 import android.widget.EditText
-import android.widget.ImageButton
 import android.widget.Toast
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.gms.ads.AdRequest
@@ -29,22 +24,10 @@ class MainActivity : AppCompatActivity() {
     private val recipes = mutableListOf<Recipe>()
 
     private lateinit var searchEditText: EditText
-    private lateinit var micButton: ImageButton
     private lateinit var buttonOpenTimer: Button
     private lateinit var buttonOpenSettings: Button
 
     private lateinit var adView: AdView
-
-    private var speechRecognizer: SpeechRecognizer? = null
-
-    private val audioPermissionLauncher =
-        registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
-            if (granted) {
-                startVoiceRecognition()
-            } else {
-                Toast.makeText(this, "Microphone permission denied", Toast.LENGTH_SHORT).show()
-            }
-        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         // Apply saved theme BEFORE inflating layout
@@ -67,7 +50,6 @@ class MainActivity : AppCompatActivity() {
         adView.loadAd(adRequest)
 
         searchEditText = findViewById(R.id.editTextSearch)
-        micButton = findViewById(R.id.buttonMic)
         buttonOpenTimer = findViewById(R.id.buttonOpenTimer)
         buttonOpenSettings = findViewById(R.id.buttonOpenSettings)
 
@@ -78,9 +60,46 @@ class MainActivity : AppCompatActivity() {
         }
         recyclerView.adapter = adapter
 
-        micButton.setOnClickListener {
-            checkAudioPermissionAndStart()
+        // ----- Search bar wiring -----
+
+        // When user presses the "search" action on the keyboard
+        searchEditText.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                val query = searchEditText.text.toString()
+                filterRecipes(query)
+                true
+            } else {
+                false
+            }
         }
+
+        // Live-filter as they type
+        searchEditText.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(
+                s: CharSequence?,
+                start: Int,
+                count: Int,
+                after: Int
+            ) { }
+
+            override fun onTextChanged(
+                s: CharSequence?,
+                start: Int,
+                before: Int,
+                count: Int
+            ) {
+                val query = s?.toString().orEmpty()
+                if (query.isBlank()) {
+                    adapter.updateData(recipes)
+                } else {
+                    filterRecipes(query)
+                }
+            }
+
+            override fun afterTextChanged(s: Editable?) { }
+        })
+
+        // ----- Buttons -----
 
         buttonOpenTimer.setOnClickListener {
             val intent = Intent(this, TimerActivity::class.java)
@@ -127,79 +146,20 @@ class MainActivity : AppCompatActivity() {
         startActivity(intent)
     }
 
-    // ---------- Voice Search ----------
-
-    private fun checkAudioPermissionAndStart() {
-        val permission = Manifest.permission.RECORD_AUDIO
-        when {
-            ContextCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_GRANTED ->
-                startVoiceRecognition()
-
-            shouldShowRequestPermissionRationale(permission) -> {
-                Toast.makeText(this, "Microphone access is needed for voice search.", Toast.LENGTH_SHORT).show()
-                audioPermissionLauncher.launch(permission)
-            }
-
-            else -> audioPermissionLauncher.launch(permission)
-        }
-    }
-
-    private fun startVoiceRecognition() {
-        if (!SpeechRecognizer.isRecognitionAvailable(this)) {
-            Toast.makeText(this, "Speech recognition not available", Toast.LENGTH_SHORT).show()
+    private fun filterRecipes(query: String) {
+        val trimmed = query.trim()
+        if (trimmed.isBlank()) {
+            adapter.updateData(recipes)
             return
         }
 
-        if (speechRecognizer == null) {
-            speechRecognizer = SpeechRecognizer.createSpeechRecognizer(this).apply {
-                setRecognitionListener(object : RecognitionListener {
-                    override fun onReadyForSpeech(params: Bundle?) {}
-                    override fun onBeginningOfSpeech() {}
-                    override fun onRmsChanged(rmsdB: Float) {}
-                    override fun onBufferReceived(buffer: ByteArray?) {}
-                    override fun onEndOfSpeech() {}
-                    override fun onError(error: Int) {
-                        Toast.makeText(this@MainActivity, "Voice error: $error", Toast.LENGTH_SHORT).show()
-                    }
-
-                    override fun onResults(results: Bundle?) {
-                        val matches = results?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
-                        val query = matches?.firstOrNull() ?: return
-                        searchEditText.setText(query)
-                        filterRecipes(query)
-                    }
-
-                    override fun onPartialResults(partialResults: Bundle?) {}
-                    override fun onEvent(eventType: Int, params: Bundle?) {}
-                })
-            }
-        }
-
-        val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
-            putExtra(
-                RecognizerIntent.EXTRA_LANGUAGE_MODEL,
-                RecognizerIntent.LANGUAGE_MODEL_FREE_FORM
-            )
-            putExtra(RecognizerIntent.EXTRA_PROMPT, "Speak recipe name or ingredient")
-        }
-
-        speechRecognizer?.startListening(intent)
-    }
-
-    private fun filterRecipes(query: String) {
-        val lower = query.lowercase()
+        val lower = trimmed.lowercase()
         val filtered = recipes.filter { recipe ->
             recipe.title.lowercase().contains(lower) ||
                     recipe.description.lowercase().contains(lower) ||
                     recipe.ingredients.any { it.lowercase().contains(lower) }
         }
         adapter.updateData(filtered)
-    }
-
-    override fun onDestroy() {
-        speechRecognizer?.destroy()
-        speechRecognizer = null
-        super.onDestroy()
     }
 
     // ---------- RecyclerView Adapter ----------
@@ -209,7 +169,10 @@ class MainActivity : AppCompatActivity() {
         private val onItemClick: (Recipe) -> Unit
     ) : RecyclerView.Adapter<RecipeViewHolder>() {
 
-        override fun onCreateViewHolder(parent: android.view.ViewGroup, viewType: Int): RecipeViewHolder {
+        override fun onCreateViewHolder(
+            parent: android.view.ViewGroup,
+            viewType: Int
+        ): RecipeViewHolder {
             val view = layoutInflater.inflate(R.layout.item_recipe, parent, false)
             return RecipeViewHolder(view)
         }

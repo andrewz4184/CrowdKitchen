@@ -42,10 +42,71 @@ class RecipeRepository private constructor(private val context: Context) {
         firestore.collection(COLLECTION_RECIPES)
             .get()
             .addOnSuccessListener { snapshot ->
+
                 val recipes = snapshot.documents.mapNotNull { doc ->
-                    // Classic (non-KTX) Firestore API:
-                    val recipe = doc.toObject(Recipe::class.java)
-                    recipe?.copy(id = doc.id)
+                    val data = doc.data ?: return@mapNotNull null
+
+                    // Helper: get raw value by matching any of several key variants, ignoring case.
+                    fun getAnyCaseInsensitive(vararg keys: String): Any? {
+                        for (key in keys) {
+                            val entry = data.entries.firstOrNull {
+                                it.key.equals(key, ignoreCase = true)
+                            }
+                            if (entry != null) return entry.value
+                        }
+                        return null
+                    }
+
+                    // Strings
+                    val title = (getAnyCaseInsensitive("title", "Title") as? String) ?: ""
+                    val description =
+                        (getAnyCaseInsensitive("description", "Description") as? String) ?: ""
+
+                    // Lists -> List<String>
+                    val ingredients: List<String> =
+                        (getAnyCaseInsensitive("ingredients", "Ingredients") as? List<*>)?.mapNotNull {
+                            it as? String
+                        } ?: emptyList()
+
+                    val steps: List<String> =
+                        (getAnyCaseInsensitive("steps", "Steps") as? List<*>)?.mapNotNull {
+                            it as? String
+                        } ?: emptyList()
+
+                    // Numbers may be stored as Long / Int / Double with weird field names.
+                    val cookTimeMinutes: Int = when (val v = getAnyCaseInsensitive(
+                        "cookTimeMinutes",
+                        "CookTimeMinutes",
+                    )) {
+                        is Long -> v.toInt()
+                        is Int -> v
+                        is Double -> v.toInt()
+                        else -> 0
+                    }
+
+                    val averageRating: Double = when (val v =
+                        getAnyCaseInsensitive("averageRating", "AverageRating")) {
+                        is Double -> v
+                        is Long -> v.toDouble()
+                        is Int -> v.toDouble()
+                        else -> 0.0
+                    }
+
+                    // If there's literally no title, skip this doc so we don't crash UI.
+                    if (title.isBlank()) {
+                        Log.w(TAG, "Skipping recipe ${doc.id} because title is blank")
+                        return@mapNotNull null
+                    }
+
+                    Recipe(
+                        id = doc.id,
+                        title = title,
+                        description = description,
+                        ingredients = ingredients,
+                        steps = steps,
+                        cookTimeMinutes = cookTimeMinutes,
+                        averageRating = averageRating
+                    )
                 }
 
                 val settings = getUserSettings()
@@ -54,6 +115,7 @@ class RecipeRepository private constructor(private val context: Context) {
                 } else {
                     recipes
                 }
+
                 onResult(sorted)
             }
             .addOnFailureListener { e ->
@@ -102,17 +164,15 @@ class RecipeRepository private constructor(private val context: Context) {
                     transaction.update(recipeRef, updates)
                     null // transaction block must return something
                 }
-                    .addOnSuccessListener {
-                        onComplete()
-                    }
-                    .addOnFailureListener { e ->
-                        Log.e(TAG, "Failed to update aggregate rating", e)
-                        onError(e)
+                    .addOnSuccessListener { onComplete() }
+                    .addOnFailureListener {
+                        Log.e(TAG, "Failed to update aggregate rating", it)
+                        onError(it)
                     }
             }
-            .addOnFailureListener { e ->
-                Log.e(TAG, "Failed to submit rating", e)
-                onError(e)
+            .addOnFailureListener {
+                Log.e(TAG, "Failed to submit rating", it)
+                onError(it)
             }
     }
 

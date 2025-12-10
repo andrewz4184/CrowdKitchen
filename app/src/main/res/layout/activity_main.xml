@@ -20,7 +20,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- Search bar + mic -->
+    <!-- Search bar (no mic) -->
     <LinearLayout
         android:id="@+id/layoutSearchBar"
         android:layout_width="0dp"
@@ -40,15 +40,6 @@
             android:hint="Search recipes or ingredients"
             android:imeOptions="actionSearch"
             android:inputType="text" />
-
-        <ImageButton
-            android:id="@+id/buttonMic"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginStart="8dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="Voice search"
-            app:srcCompat="@drawable/ic_mic" />
     </LinearLayout>
 
     <!-- Timer button -->
