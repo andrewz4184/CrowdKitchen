@@ -19,7 +19,6 @@ class SettingsActivity : AppCompatActivity() {
     private lateinit var buttonSave: Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        // Apply current theme before inflating layout
         val repoForTheme = RecipeRepository.getInstance(this)
         val currentSettings = repoForTheme.getUserSettings()
         AppCompatDelegate.setDefaultNightMode(
@@ -32,7 +31,6 @@ class SettingsActivity : AppCompatActivity() {
 
         repository = repoForTheme
 
-        // Back button in layout
         findViewById<ImageButton>(R.id.buttonBackSettings).setOnClickListener {
             finish()
         }
@@ -42,7 +40,6 @@ class SettingsActivity : AppCompatActivity() {
         switchDarkMode = findViewById(R.id.switchDarkMode)
         buttonSave = findViewById(R.id.buttonSaveSettings)
 
-        // Load existing settings
         editDefaultTimer.setText(currentSettings.defaultTimerMinutes.toString())
         switchSortByRating.isChecked = currentSettings.sortByRating
         switchDarkMode.isChecked = currentSettings.darkMode
@@ -64,7 +61,6 @@ class SettingsActivity : AppCompatActivity() {
 
         repository.saveUserSettings(newSettings)
 
-        // Apply theme immediately
         AppCompatDelegate.setDefaultNightMode(
             if (newSettings.darkMode) AppCompatDelegate.MODE_NIGHT_YES
             else AppCompatDelegate.MODE_NIGHT_NO

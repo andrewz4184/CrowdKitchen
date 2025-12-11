@@ -24,8 +24,6 @@ class RecipeDetailActivity : AppCompatActivity() {
     private lateinit var buttonBack: ImageButton
 
     private var recipeId: String? = null
-
-    // Fields used to build the share message
     private lateinit var shareIngredients: String
     private lateinit var shareSteps: String
     private lateinit var shareTitle: String
@@ -36,7 +34,6 @@ class RecipeDetailActivity : AppCompatActivity() {
 
         repository = RecipeRepository.getInstance(this)
 
-        // Back button in layout
         buttonBack = findViewById(R.id.buttonBack)
         buttonBack.setOnClickListener { finish() }
 
@@ -49,7 +46,6 @@ class RecipeDetailActivity : AppCompatActivity() {
         buttonSubmitRating = findViewById(R.id.buttonSubmitRating)
         buttonShare = findViewById(R.id.btnShare)
 
-        // Read data passed from MainActivity
         recipeId = intent.getStringExtra(EXTRA_RECIPE_ID)
         val title = intent.getStringExtra(EXTRA_RECIPE_TITLE).orEmpty()
         val description = intent.getStringExtra(EXTRA_RECIPE_DESCRIPTION).orEmpty()
@@ -58,7 +54,6 @@ class RecipeDetailActivity : AppCompatActivity() {
         val cookTime = intent.getIntExtra(EXTRA_RECIPE_COOK_TIME, 0)
         val avgRating = intent.getDoubleExtra(EXTRA_RECIPE_AVG_RATING, 0.0)
 
-        // Populate UI
         textTitle.text = title
         textDescription.text = description
         textIngredients.text = ingredients.joinToString("\n") { "• $it" }
@@ -66,12 +61,10 @@ class RecipeDetailActivity : AppCompatActivity() {
         textCookTime.text = "Cook time: $cookTime min"
         ratingBarUser.rating = avgRating.toFloat()
 
-        // Prep values for share feature
         shareTitle = title
         shareIngredients = ingredients.joinToString("\n") { "• $it" }
         shareSteps = steps.joinToString("\n") { "• $it" }
 
-        // Submit rating
         buttonSubmitRating.setOnClickListener {
             val id = recipeId
             if (id == null) {
@@ -93,7 +86,6 @@ class RecipeDetailActivity : AppCompatActivity() {
             )
         }
 
-        // Share button
         buttonShare.setOnClickListener {
             shareRecipe()
         }

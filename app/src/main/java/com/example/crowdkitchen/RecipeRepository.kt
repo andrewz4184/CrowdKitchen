@@ -12,7 +12,6 @@ class RecipeRepository private constructor(private val context: Context) {
     private val prefs: SharedPreferences =
         context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
 
-    // ---------- Local persistent data (UserSettings) ----------
 
     fun getUserSettings(): UserSettings {
         val defaultMinutes = prefs.getInt(KEY_DEFAULT_TIMER_MINUTES, 10)
@@ -33,8 +32,6 @@ class RecipeRepository private constructor(private val context: Context) {
             .apply()
     }
 
-    // ---------- Remote persistent data (recipes + ratings via Firebase) ----------
-
     fun getRecipes(
         onResult: (List<Recipe>) -> Unit,
         onError: (Exception) -> Unit = {}
@@ -46,7 +43,6 @@ class RecipeRepository private constructor(private val context: Context) {
                 val recipes = snapshot.documents.mapNotNull { doc ->
                     val data = doc.data ?: return@mapNotNull null
 
-                    // Helper: get raw value by matching any of several key variants, ignoring case.
                     fun getAnyCaseInsensitive(vararg keys: String): Any? {
                         for (key in keys) {
                             val entry = data.entries.firstOrNull {
@@ -57,12 +53,10 @@ class RecipeRepository private constructor(private val context: Context) {
                         return null
                     }
 
-                    // Strings
                     val title = (getAnyCaseInsensitive("title", "Title") as? String) ?: ""
                     val description =
                         (getAnyCaseInsensitive("description", "Description") as? String) ?: ""
 
-                    // Lists -> List<String>
                     val ingredients: List<String> =
                         (getAnyCaseInsensitive("ingredients", "Ingredients") as? List<*>)?.mapNotNull {
                             it as? String
@@ -73,7 +67,6 @@ class RecipeRepository private constructor(private val context: Context) {
                             it as? String
                         } ?: emptyList()
 
-                    // Numbers may be stored as Long / Int / Double with weird field names.
                     val cookTimeMinutes: Int = when (val v = getAnyCaseInsensitive(
                         "cookTimeMinutes",
                         "CookTimeMinutes",
@@ -92,7 +85,6 @@ class RecipeRepository private constructor(private val context: Context) {
                         else -> 0.0
                     }
 
-                    // If there's literally no title, skip this doc so we don't crash UI.
                     if (title.isBlank()) {
                         Log.w(TAG, "Skipping recipe ${doc.id} because title is blank")
                         return@mapNotNull null
@@ -162,7 +154,7 @@ class RecipeRepository private constructor(private val context: Context) {
                     )
 
                     transaction.update(recipeRef, updates)
-                    null // transaction block must return something
+                    null
                 }
                     .addOnSuccessListener { onComplete() }
                     .addOnFailureListener {

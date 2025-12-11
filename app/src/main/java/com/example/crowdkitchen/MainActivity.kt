@@ -30,7 +30,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var adView: AdView
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        // Apply saved theme BEFORE inflating layout
+
         val repoForTheme = RecipeRepository.getInstance(this)
         val settings = repoForTheme.getUserSettings()
         AppCompatDelegate.setDefaultNightMode(
@@ -43,7 +43,7 @@ class MainActivity : AppCompatActivity() {
 
         repository = repoForTheme
 
-        // Initialize ads
+        //Initialize ads
         MobileAds.initialize(this) {}
         adView = findViewById(R.id.adView)
         val adRequest = AdRequest.Builder().build()
@@ -60,9 +60,6 @@ class MainActivity : AppCompatActivity() {
         }
         recyclerView.adapter = adapter
 
-        // ----- Search bar wiring -----
-
-        // When user presses the "search" action on the keyboard
         searchEditText.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_SEARCH) {
                 val query = searchEditText.text.toString()
@@ -73,7 +70,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        // Live-filter as they type
+        //Live filter as they type
         searchEditText.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(
                 s: CharSequence?,
@@ -98,8 +95,6 @@ class MainActivity : AppCompatActivity() {
 
             override fun afterTextChanged(s: Editable?) { }
         })
-
-        // ----- Buttons -----
 
         buttonOpenTimer.setOnClickListener {
             val intent = Intent(this, TimerActivity::class.java)
@@ -161,8 +156,6 @@ class MainActivity : AppCompatActivity() {
         }
         adapter.updateData(filtered)
     }
-
-    // ---------- RecyclerView Adapter ----------
 
     private inner class RecipeAdapter(
         private var data: List<Recipe>,

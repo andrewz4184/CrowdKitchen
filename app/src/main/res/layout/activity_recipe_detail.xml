@@ -10,7 +10,6 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <!-- Back button -->
         <ImageButton
             android:id="@+id/buttonBack"
             android:layout_width="40dp"
@@ -21,7 +20,6 @@
             android:contentDescription="Back"
             android:layout_margin="8dp"/>
 
-        <!-- Title -->
         <TextView
             android:id="@+id/textRecipeTitleDetail"
             android:layout_width="match_parent"
@@ -31,7 +29,6 @@
             android:textStyle="bold"
             android:layout_marginBottom="8dp" />
 
-        <!-- Description -->
         <TextView
             android:id="@+id/textRecipeDescriptionDetail"
             android:layout_width="match_parent"
@@ -39,7 +36,6 @@
             android:text="Short description of the recipe."
             android:layout_marginBottom="8dp" />
 
-        <!-- Cook time -->
         <TextView
             android:id="@+id/textCookTime"
             android:layout_width="match_parent"
@@ -48,7 +44,6 @@
             android:textStyle="italic"
             android:layout_marginBottom="12dp" />
 
-        <!-- Ingredients header -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -56,7 +51,6 @@
             android:textStyle="bold"
             android:layout_marginBottom="4dp" />
 
-        <!-- Ingredients body -->
         <TextView
             android:id="@+id/textIngredients"
             android:layout_width="match_parent"
@@ -64,7 +58,6 @@
             android:text="• Ingredient 1\n• Ingredient 2"
             android:layout_marginBottom="12dp" />
 
-        <!-- Steps header -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -72,7 +65,6 @@
             android:textStyle="bold"
             android:layout_marginBottom="4dp" />
 
-        <!-- Steps body -->
         <TextView
             android:id="@+id/textSteps"
             android:layout_width="match_parent"
@@ -80,7 +72,6 @@
             android:text="1. Step one...\n\n2. Step two..."
             android:layout_marginBottom="16dp" />
 
-        <!-- User rating header -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -88,7 +79,6 @@
             android:textStyle="bold"
             android:layout_marginBottom="4dp" />
 
-        <!-- Rating bar -->
         <RatingBar
             android:id="@+id/ratingBarUser"
             android:layout_width="wrap_content"
@@ -97,7 +87,6 @@
             android:stepSize="1.0"
             android:layout_marginBottom="12dp" />
 
-        <!-- Submit rating button -->
         <Button
             android:id="@+id/buttonSubmitRating"
             android:layout_width="match_parent"
@@ -105,7 +94,6 @@
             android:text="Submit Rating"
             android:layout_marginBottom="12dp" />
 
-        <!-- NEW: Share via Email button -->
         <Button
             android:id="@+id/btnShare"
             android:layout_width="match_parent"

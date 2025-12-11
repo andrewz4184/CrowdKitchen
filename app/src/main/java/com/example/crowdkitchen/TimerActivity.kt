@@ -44,14 +44,12 @@ class TimerActivity : AppCompatActivity() {
         progressBar.max = selectedMinutes * 60
 
         findViewById<ImageButton>(R.id.buttonBackTimer).setOnClickListener {
-            finish() // returns to MainActivity
+            finish()
         }
 
 
-        // New GUI component + listener: SeekBar
         seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                // Avoid 0 minutes timer – set a minimum of 1
                 selectedMinutes = if (progress < 1) 1 else progress
                 updateTimeLabel(selectedMinutes * 60 * 1000L)
                 progressBar.max = selectedMinutes * 60
@@ -59,7 +57,6 @@ class TimerActivity : AppCompatActivity() {
 
             override fun onStartTrackingTouch(seekBar: SeekBar?) {}
             override fun onStopTrackingTouch(seekBar: SeekBar?) {
-                // Persist as new default timer length (local persistent data)
                 val newSettings = repository.getUserSettings().copy(
                     defaultTimerMinutes = selectedMinutes
                 )

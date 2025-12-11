@@ -6,7 +6,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- App title -->
     <TextView
         android:id="@+id/textTitle"
         android:layout_width="0dp"
@@ -20,7 +19,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- Search bar (no mic) -->
     <LinearLayout
         android:id="@+id/layoutSearchBar"
         android:layout_width="0dp"
@@ -42,7 +40,6 @@
             android:inputType="text" />
     </LinearLayout>
 
-    <!-- Timer button -->
     <Button
         android:id="@+id/buttonOpenTimer"
         android:layout_width="0dp"
@@ -55,7 +52,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- Settings button -->
     <Button
         android:id="@+id/buttonOpenSettings"
         android:layout_width="0dp"
@@ -68,7 +64,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- Recipes list -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerRecipes"
         android:layout_width="0dp"
@@ -80,7 +75,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- Ad banner -->
     <com.google.android.gms.ads.AdView
         android:id="@+id/adView"
         android:layout_width="0dp"
